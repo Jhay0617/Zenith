@@ -34,8 +34,10 @@ export const transformApiData = (response) => {
     const { id, title } = data;
 
     const newData = {
+      id: id,
       amount: id,
       description: title,
+      date: `2025-12-${(id % 25) + 1}`,
       type: id % 2 === 0 ? "income" : "expense",
     };
 
@@ -83,11 +85,12 @@ export const getFormattedList = (data) => {
 
 export const getCategoryTotals = (data) => {
   return data.reduce((acc, cur) => {
-    if (!acc[cur]) {
-      acc[cur] = 0;
+    const { amount, type } = cur;
+    if (!acc[type]) {
+      acc[type] = 0;
     }
 
-    acc[cur] += cur.amount;
+    acc[type] += amount;
 
     return acc;
   }, {});
@@ -97,4 +100,10 @@ export const getGoalProgress = (data) => {
   const percentage = (data.currentBalance / data.savingsGoal) * 100;
 
   return `${Math.round(percentage)}% of ${data.goalName} achieved!`;
+};
+export const formatChartData = (categoryTotals) => {
+  return Object.entries(categoryTotals).map(([key, val]) => ({
+    name: key,
+    value: val,
+  }));
 };
