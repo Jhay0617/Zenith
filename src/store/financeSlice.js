@@ -3,14 +3,17 @@ import { safeFetch } from "../api/ApiService";
 import { transformApiData } from "../utils/helpers";
 
 const initialState = {
-  items: [],
+  transactions: [],
   status: "idle",
   error: null,
 };
 export const fetchAllTransactions = createAsyncThunk(
-  "finance/fetchAllTransactions",
+  "finance/fetch",
   async () => {
-    const response = await safeFetch("jsonplaceholder.typicode.com");
+    const response = await safeFetch(
+      "https://jsonplaceholder.typicode.com/posts"
+    );
+    console.log("3. Thunk started!");
     const transformedData = transformApiData(response);
     return transformedData;
   }
@@ -21,7 +24,7 @@ const financeSlice = createSlice({
   initialState,
   reducers: {
     resetFinance(state) {
-      state.items = [];
+      state.transactions = [];
     },
   },
   extraReducers: (builder) => {
@@ -30,16 +33,19 @@ const financeSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchAllTransactions.fulfilled, (state, action) => {
-        state.fulfilled = "fulfilled";
+        state.status = "fulfilled";
 
-        state.items = action.payload;
+        state.transactions = action.payload;
       })
       .addCase(fetchAllTransactions.rejected, (state, action) => {
-        state.rejected = "failed";
+        state.status = "failed";
 
         state.error = action.error.message;
       });
   },
 });
 export const { resetFinance } = financeSlice.actions;
+
+export const getFinanceData = (state) => state.finance;
+
 export default financeSlice.reducer;
